@@ -1,11 +1,13 @@
 ---
 - name: Deploy Spring Boot app
-  hosts: local
+  hosts: localhost
+  become: true
   tasks:
     - name: Ensure deploy directory exists
       file:
         path: /opt/online-bookstore
         state: directory
+        mode: '0755'
 
     - name: Backup current JAR if exists
       copy:
@@ -27,3 +29,5 @@
     - name: Start app in background
       shell: |
         nohup java -jar /opt/online-bookstore/app.jar > /opt/online-bookstore/app.log 2>&1 &
+      args:
+        executable: /bin/bash
