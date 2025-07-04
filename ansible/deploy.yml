@@ -1,0 +1,29 @@
+---
+- name: Deploy Spring Boot app
+  hosts: local
+  tasks:
+    - name: Ensure deploy directory exists
+      file:
+        path: /opt/online-bookstore
+        state: directory
+
+    - name: Backup current JAR if exists
+      copy:
+        src: /opt/online-bookstore/app.jar
+        dest: /opt/online-bookstore/backup-app-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.jar
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: Copy new JAR to deploy directory
+      copy:
+        src: files/app.jar
+        dest: /opt/online-bookstore/app.jar
+        mode: '0755'
+
+    - name: Stop any running instance
+      shell: |
+        pkill -f 'java.*app.jar' || true
+
+    - name: Start app in background
+      shell: |
+        nohup java -jar /opt/online-bookstore/app.jar > /opt/online-bookstore/app.log 2>&1 &

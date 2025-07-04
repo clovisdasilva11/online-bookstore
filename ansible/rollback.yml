@@ -1,0 +1,42 @@
+---
+- name: Rollback to last backup JAR
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Ensure /opt/online-bookstore/ exists
+      file:
+        path: /opt/online-bookstore/
+        state: directory
+
+    - name: Find latest backup JAR
+      find:
+        paths: /opt/online-bookstore/
+        patterns: 'backup-app-*.jar'
+        recurse: no
+        age_stamp: mtime
+      register: backups
+
+    - name: Fail if no backup found
+      fail:
+        msg: "No backup found to rollback."
+      when: backups.files | length == 0
+
+    - name: Set latest backup JAR path
+      set_fact:
+        latest_backup: "{{ backups.files | sort(attribute='mtime', reverse=true) | first }}"
+
+    - name: Replace current app.jar with latest backup
+      copy:
+        src: "{{ latest_backup.path }}"
+        dest: /opt/online-bookstore/app.jar
+        remote_src: yes
+        mode: '0755'
+
+    - name: Restart application with backup JAR
+      shell: |
+        pkill -f 'java.*app.jar' || true
+        nohup java -jar /opt/online-bookstore/app.jar > /opt/online-bookstore/app.log 2>&1 &
+      args:
+        executable: /bin/bash
