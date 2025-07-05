@@ -5,25 +5,27 @@
   tasks:
 
     - name: Backup current Docker image (if exists)
-      shell: docker image tag bookstore-app:latest bookstore-app:backup || true
+      shell: |
+        docker image inspect bookstore-app:latest && \
+        docker image tag bookstore-app:latest bookstore-app:backup || true
       ignore_errors: yes
 
     - name: Stop existing containers (if running)
       shell: docker compose down
       args:
-        chdir: "{{ playbook_dir }}/.."   # go to root dir of project
+        chdir: "{{ playbook_dir }}/.."  # Go to root dir (where docker-compose.yml is)
 
     - name: Build and start new containers
       shell: docker compose up -d --build
       args:
-        chdir: "{{ playbook_dir }}/.."   # same: root dir where docker-compose.yml is
+        chdir: "{{ playbook_dir }}/.."  # Same root directory
 
-    - name: Health check the bookstore app
+    - name: Wait for Spring Boot app to be healthy
       uri:
         url: http://localhost:8081/actuator/health
         status_code: 200
         timeout: 10
       register: health_result
-      retries: 5
-      delay: 5
+      retries: 10
+      delay: 6
       until: health_result.status == 200

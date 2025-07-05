@@ -12,7 +12,7 @@ services:
       - REDIS_TAGDB=1       # Enable Redis for TagDB
       - COLLECTD=1          # Enable Collectd service
       - RELAY=1             # Enable carbon-relay
-      - GOCARBON=1          # Enable go-carbon (alternative to carbon-cache)
+      - GOCARBON=1          # Enable go-carbon
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
@@ -24,7 +24,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "8181:3000"   # Grafana UI port
+      - "8181:3000"   # Grafana UI
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -33,7 +33,9 @@ services:
     restart: always
 
   bookstore:
-    build: .
+    build:
+      context: .
+    image: bookstore-app:latest  # 👈 This allows tagging/rollback
     container_name: bookstore
     ports:
       - "8081:8081"

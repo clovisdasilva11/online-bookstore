@@ -7,13 +7,32 @@
     - name: Stop current containers
       shell: docker compose down
       args:
-        chdir: "{{ playbook_dir }}/.."  # go to root dir
+        chdir: "{{ playbook_dir }}/.."
 
-    - name: Retag backup as latest
+    - name: Check if backup image exists
+      shell: docker image inspect bookstore-app:backup
+      register: backup_check
+      ignore_errors: yes
+
+    - name: Fail if no backup image found
+      fail:
+        msg: "No backup image 'bookstore-app:backup' found. Cannot rollback."
+      when: backup_check.rc != 0
+
+    - name: Retag backup image as latest
       shell: docker image tag bookstore-app:backup bookstore-app:latest
-      ignore_errors: no
 
-    - name: Restart containers with backup image
+    - name: Start containers with backup image
       shell: docker compose up -d
       args:
         chdir: "{{ playbook_dir }}/.."
+
+    - name: Confirm backup app is healthy
+      uri:
+        url: http://localhost:8081/actuator/health
+        status_code: 200
+        timeout: 10
+      register: health_result
+      retries: 10
+      delay: 6
+      until: health_result.status == 200
