@@ -1,4 +1,3 @@
-# deploy.yml
 - name: Deploy Docker-based Online Bookstore
   hosts: local
   become: yes
@@ -10,15 +9,19 @@
         docker image tag bookstore-app:latest bookstore-app:backup || true
       ignore_errors: yes
 
+    - name: Force stop and remove all containers to avoid port conflicts
+      shell: docker rm -f $(docker ps -aq) || true
+      ignore_errors: yes
+
     - name: Stop existing containers (if running)
       shell: docker compose down
       args:
-        chdir: "{{ playbook_dir }}/.."  # Go to root dir (where docker-compose.yml is)
+        chdir: "{{ playbook_dir }}/.."
 
     - name: Build and start new containers
       shell: docker compose up -d --build
       args:
-        chdir: "{{ playbook_dir }}/.."  # Same root directory
+        chdir: "{{ playbook_dir }}/.."
 
     - name: Wait for Spring Boot app to be healthy
       uri:
