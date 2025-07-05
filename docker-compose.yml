@@ -5,14 +5,14 @@ services:
     image: graphiteapp/graphite-statsd
     container_name: graphite
     ports:
-      - "2003:2003"   # Plaintext metrics input port
-      - "2004:2004"   # Pickle protocol port
-      - "8182:80"     # Graphite Web UI port
+      - "2003:2003"  
+      - "2004:2004"   
+      - "8182:80"     
     environment:
-      - REDIS_TAGDB=1       # Enable Redis for TagDB
-      - COLLECTD=1          # Enable Collectd service
-      - RELAY=1             # Enable carbon-relay
-      - GOCARBON=1          # Enable go-carbon
+      - REDIS_TAGDB=1       
+      - COLLECTD=1          
+      - RELAY=1            
+      - GOCARBON=1          
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
@@ -24,7 +24,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "8181:3000"   # Grafana UI
+      - "8181:3000"   
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -35,7 +35,7 @@ services:
   bookstore:
     build:
       context: .
-    image: bookstore-app:latest  # 👈 This allows tagging/rollback
+    image: bookstore-app:latest 
     container_name: bookstore
     ports:
       - "8081:8081"
