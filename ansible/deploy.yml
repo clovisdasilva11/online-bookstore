@@ -1,34 +1,29 @@
----
-- name: Deploy Spring Boot app
-  hosts: localhost
-  become: true
+# deploy.yml
+- name: Deploy Docker-based Online Bookstore
+  hosts: local
+  become: yes
   tasks:
-    - name: Ensure deploy directory exists
-      file:
-        path: /opt/online-bookstore
-        state: directory
-        mode: '0755'
 
-    - name: Backup current JAR if exists
-      copy:
-        src: /opt/online-bookstore/app.jar
-        dest: /opt/online-bookstore/backup-app-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.jar
-        remote_src: yes
+    - name: Backup current Docker image (if exists)
+      shell: docker image tag bookstore-app:latest bookstore-app:backup || true
       ignore_errors: yes
 
-    - name: Copy new JAR to deploy directory
-      copy:
-        src: files/app.jar
-        dest: /opt/online-bookstore/app.jar
-        mode: '0755'
-
-    - name: Stop any running instance
-      shell: |
-        pkill -f 'java.*app.jar' || true
-      ignore_errors: yes  # ✅ This prevents task failure if app is not running
-
-    - name: Start app in background
-      shell: |
-        nohup java -jar /opt/online-bookstore/app.jar > /opt/online-bookstore/app.log 2>&1 &
+    - name: Stop existing containers (if running)
+      shell: docker compose down
       args:
-        executable: /bin/bash
+        chdir: "{{ playbook_dir }}/.."   # go to root dir of project
+
+    - name: Build and start new containers
+      shell: docker compose up -d --build
+      args:
+        chdir: "{{ playbook_dir }}/.."   # same: root dir where docker-compose.yml is
+
+    - name: Health check the bookstore app
+      uri:
+        url: http://localhost:8081/actuator/health
+        status_code: 200
+        timeout: 10
+      register: health_result
+      retries: 5
+      delay: 5
+      until: health_result.status == 200
