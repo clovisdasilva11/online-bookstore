@@ -1,6 +1,6 @@
 package com.example.bookstore.controller;
 
-import com.example.bookstore.entity.Order;
+import com.example.bookstore.entity.Orders;
 import com.example.bookstore.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public Order placeOrder(@RequestBody Order order) {
+    public Orders placeOrder(@RequestBody Orders order) {
         return orderService.processOrder(order);
     }
 }

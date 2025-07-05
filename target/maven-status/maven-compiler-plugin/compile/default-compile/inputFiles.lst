@@ -1,4 +1,3 @@
-/home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/entity/Order.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/controller/PaymentController.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/entity/Book.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/repository/PaymentRepository.java
@@ -6,6 +5,7 @@
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/repository/UserRepository.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/dto/PaymentRequest.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/controller/OrderController.java
+/home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/entity/Orders.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/entity/Payment.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/entity/CartItem.java
 /home/vboxuser/eclipse-workspace/online-bookstore/src/main/java/com/example/bookstore/BookstoreApplication.java

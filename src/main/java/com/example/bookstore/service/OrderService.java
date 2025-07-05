@@ -1,6 +1,6 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.entity.Order;
+import com.example.bookstore.entity.Orders;
 import com.example.bookstore.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class OrderService {
         this.bookService = bookService;
     }
 
-    public Order processOrder(Order order) {
+    public Orders processOrder(Orders order) {
         bookService.updateStock(order.getBookId(), order.getQuantity());
         return orderRepo.save(order);
     }
